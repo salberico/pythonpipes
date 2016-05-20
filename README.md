@@ -1,4 +1,4 @@
-# Example ![ScreenShot](http://res.cloudinary.com/urbandictionary/image/upload/a_exif,c_fit,h_200,w_200/v1395991705/gjn81wvxqsq6yzcwubok.png)
+# Example 
 ```
 > Width Height Delay: 70 30
 ╔╦═╗╔═╦╦═╗╔╦╗╔╦═══╦╦╗╔═╦═╗╔╗╔═╗╔╗╔╗╔╦══╗╔╗╔╗╔╦═╦═╗╔═╦╗╔════╗╔╗╔╦╗╔╦╗╔╗
