@@ -61,10 +61,10 @@ def gen_pipeline(w, h, p = 0):
 				elif x == w-1:
 					c = (find_pipe(pline[h-2][w-3])[0]) + (find_pipe(pline[h-3][w-2])[1]) + (find_lu(pline[h-2][w-1])[0]) + (find_lu(pline[h-1][w-2])[1])
 					if c == 1:
-						if pline[h-2][w-1] == "╣":
-							pline[h-2][w-1] = "║"
+						if pline[h-2][w-1] == u'╣':
+							pline[h-2][w-1] = u'║'
 						else:
-							pline[h-2][w-1] = "╣"
+							pline[h-2][w-1] = u'╣'
 					pline[h-z][x-1] = rand_char(pipe_lurd[find_pipe(pline[h-2][w-3])[0]][find_pipe(pline[h-3][w-2])[1]][find_lu(pline[h-2][w-1])[0]][find_lu(pline[h-1][w-2])[1]])
 				else: pline[h-z][x] = rand_char(pipe_lud[find_pipe(pline[h-2][x-1])[0]][find_pipe(pline[h-3][x])[1]][find_lu(pline[h-1][x])[1]])
 	return pline
