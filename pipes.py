@@ -1,9 +1,20 @@
 # -​- coding: utf-8 -​-
+# salberico
 from __future__ import print_function
 from random import randint
 from time import sleep
 import sys
 from data import *
+import argparse
+
+def parse_args():
+	parser = argparse.ArgumentParser(description='Pythonpipes')
+	parser.add_argument('-w', dest='width', help='Width of random pipe output. [10]', default=10, type=int)
+	parser.add_argument('-l', dest='lines', help='Number of lines in random pipe output. [10]', default=5, type=int)
+	parser.add_argument('-d', dest='delay', help='Delay between subsequent printing of lines. [0]', default=0, type=int)
+	parser.add_argument('-s', dest='save', help='Save to file if specified otherwise just print. [none] (overides delay)', type=str)
+	args = parser.parse_args()
+	return args
 
 def rand_char(s):
 	return s[randint(0,len(s)-1)]
@@ -68,9 +79,24 @@ def gen_pipeline(w, h, p = 0):
 					pline[h-z][x-1] = rand_char(pipe_lurd[find_pipe(pline[h-2][w-3])[0]][find_pipe(pline[h-3][w-2])[1]][find_lu(pline[h-2][w-1])[0]][find_lu(pline[h-1][w-2])[1]])
 				else: pline[h-z][x] = rand_char(pipe_lud[find_pipe(pline[h-2][x-1])[0]][find_pipe(pline[h-3][x])[1]][find_lu(pline[h-1][x])[1]])
 	return pline
+
+def save_pline(width, lines, name):
+	p = gen_pipeline(width,lines)
+	f = open(name, 'wb')
+	z = []
+	for y in range(len(p)):
+		z.append("")
+		for x in range(len(p[y])): 
+			z[y] += p[y][x]
+		if not y==len(p)-1:
+			z[y] += "\n"
+	for i,x in enumerate(z):
+		z[i] = x.encode("utf-8")
+	f.writelines(z)
+	f.close()
 	
-def print_pline(width=3, height=3, delay=0):
-	p = gen_pipeline(width,height)
+def print_pline(width, lines, delay):
+	p = gen_pipeline(width,lines)
 	z = []
 	for y in range(len(p)):
 		z.append([""])
@@ -81,11 +107,10 @@ def print_pline(width=3, height=3, delay=0):
 		print(z[x][0])
 	
 if __name__ == "__main__":
-	i = sys.argv[1:]
-	if len(i) < 2:
-		print("please specify width and height")
-		exit()
-	if len(i) < 3:
-		i.append("0")
-	print_pline(int(i[0]),int(i[1]),float(i[2]))
+	args = parse_args()
+	print(args)
+	if args.save:
+		save_pline(args.width, args.lines, args.save)
+	else:
+		print_pline(args.width, args.lines, args.delay)
 		
