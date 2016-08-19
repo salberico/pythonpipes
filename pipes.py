@@ -23,16 +23,14 @@ def find_pipe(p):
 	for x in range(2):
 		for y in range(2):
 			for z in range(len(pipe_rd[x][y])):
-				if pipe_rd[x][y][z] == p:
-					return (x,y)
+				if pipe_rd[x][y][z] == p: return (x,y)
 	return (0,0)
 	
 def find_lu(p):
 	for x in range(2):
 		for y in range(2):
 			for z in range(len(pipe_lu[x][y])):
-				if pipe_lu[x][y][z] == p:
-					return (x,y)
+				if pipe_lu[x][y][z] == p: return (x,y)
 	return (0,0)
 		
 def gen_pipeline(w, h, p = 0):
