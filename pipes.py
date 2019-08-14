@@ -9,9 +9,9 @@ import argparse
 
 def parse_args():
 	parser = argparse.ArgumentParser(description='Pythonpipes')
-	parser.add_argument('-w', dest='width', help='Width of random pipe output. [10]', default=10, type=int)
-	parser.add_argument('-l', dest='lines', help='Number of lines in random pipe output. [10]', default=5, type=int)
-	parser.add_argument('-d', dest='delay', help='Delay between subsequent printing of lines. [0]', default=0, type=int)
+	parser.add_argument('-w', dest='width', help='Width of random pipe output. [80]', default=80, type=int)
+	parser.add_argument('-l', dest='lines', help='Number of lines in random pipe output, -1 for infinite. [-1]', default=-1, type=int)
+	parser.add_argument('-d', dest='delay', help='Delay between subsequent printing of lines. [0]', default=0, type=float)
 	parser.add_argument('-s', dest='save', help='Save to file if specified otherwise just print. [none] (overides delay)', type=str)
 	args = parser.parse_args()
 	return args
@@ -32,26 +32,19 @@ def find_lu(p):
 			for z in range(len(pipe_lu[x][y])):
 				if pipe_lu[x][y][z] == p: return (x,y)
 	return (0,0)
-		
-def gen_pipeline(w, h, p = 0):
-	if w < 3 or h < 3:
-		return 
-	pline = [[]]
-	pline[0].append(pipes[0])
+	
+def gen_start(w):
+	pline = []
+	pline.append(pipes[0])
 	for x in range(1,w-1):
 		if x == w - 2:	
-			pline[0].append(rand_char(pipe_b[find_pipe(pline[0][x-1])[0]][0]))
+			pline.append(rand_char(pipe_b[find_pipe(pline[x-1])[0]][0]))
 		else:
-			pline[0].append(rand_char(pipe_lu[find_pipe(pline[0][x-1])[0]][0]))
-	pline[0].append("╗")
-	for y in range(1,h):
-		pline.append([])
-		pline[y].append(rand_char(pipe_lu[0][find_pipe(pline[y-1][0])[1]]))
-		for x in range(1,w-2):
-			pline[y].append(rand_char(pipe_lu[find_pipe(pline[y][x-1])[0]][find_pipe(pline[y-1][x])[1]]))
-		pline[y].append("x")
-		pline[y].append(rand_char(pipe_eu[find_pipe(pline[y-1][w-1])[1]]))
-		pline[y][w-2] = rand_char(pipe_lur[find_pipe(pline[y][w-3])[0]][find_pipe(pline[y-1][w-2])[1]][find_lu(pline[y][w-1])[0]])
+			pline.append(rand_char(pipe_lu[find_pipe(pline[x-1])[0]][0]))
+	pline.append("╗")
+	return pline
+
+def gen_cap(pline, w, h):
 	for z in range(1,3):
 		for x in range(0,w):
 			if z == 1 and x == 0:
@@ -76,6 +69,33 @@ def gen_pipeline(w, h, p = 0):
 							pline[h-2][w-1] = u'╣'
 					pline[h-z][x-1] = rand_char(pipe_lurd[find_pipe(pline[h-2][w-3])[0]][find_pipe(pline[h-3][w-2])[1]][find_lu(pline[h-2][w-1])[0]][find_lu(pline[h-1][w-2])[1]])
 				else: pline[h-z][x] = rand_char(pipe_lud[find_pipe(pline[h-2][x-1])[0]][find_pipe(pline[h-3][x])[1]][find_lu(pline[h-1][x])[1]])
+	return 
+
+def gen_pipeline(w, h, p=0, delay=0):
+	if w < 3 or (h < 3 and h != -1):
+		return 
+	pline = [[]]
+	pline[0] = gen_start(w)
+	if (p):
+		print(''.join(pline[0]))
+
+	y = 1
+	while (y != h):
+		sleep(delay)
+		pline.append([])
+		pline[y].append(rand_char(pipe_lu[0][find_pipe(pline[y-1][0])[1]]))
+		for x in range(1,w-2):
+			pline[y].append(rand_char(pipe_lu[find_pipe(pline[y][x-1])[0]][find_pipe(pline[y-1][x])[1]]))
+		pline[y].append("x")
+		pline[y].append(rand_char(pipe_eu[find_pipe(pline[y-1][w-1])[1]]))
+		pline[y][w-2] = rand_char(pipe_lur[find_pipe(pline[y][w-3])[0]][find_pipe(pline[y-1][w-2])[1]][find_lu(pline[y][w-1])[0]])
+		if (h == -1 or y < h-2):
+			print(''.join(pline[y]))
+		y += 1
+	gen_cap(pline, w, h)
+	for z in range(h-2, h):
+		sleep(delay)
+		print(''.join(pline[z]))
 	return pline
 
 def save_pline(width, lines, name):
@@ -94,15 +114,7 @@ def save_pline(width, lines, name):
 	f.close()
 	
 def print_pline(width, lines, delay):
-	p = gen_pipeline(width,lines)
-	z = []
-	for y in range(len(p)):
-		z.append([""])
-		for x in range(len(p[y])): 
-			z[y][0] += p[y][x]
-	for x in range(len(z)): 
-		sleep(delay)
-		print(z[x][0])
+	gen_pipeline(width,lines,p=1,delay=delay)
 	
 if __name__ == "__main__":
 	args = parse_args()
@@ -110,5 +122,8 @@ if __name__ == "__main__":
 	if args.save:
 		save_pline(args.width, args.lines, args.save)
 	else:
-		print_pline(args.width, args.lines, args.delay)
+		try:
+			print_pline(args.width, args.lines, args.delay)
+		except KeyboardInterrupt:
+			exit(0)
 		
